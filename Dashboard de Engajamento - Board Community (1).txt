@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Board Community Dashboard - StartSe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .bg-navy { background-color: #001A3D; }
+        .text-orange { color: #FF6600; }
+        .bg-orange { background-color: #FF6600; }
+        .border-orange { border-color: #FF6600; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-navy text-white p-6 shadow-lg border-b-4 border-orange">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight">Board Community</h1>
+                <p class="text-orange text-sm font-medium">Dashboard de Engajamento & Inscrições</p>
+            </div>
+            <div class="text-right">
+                <span class="text-xs uppercase opacity-70">Última atualização</span>
+                <p class="text-sm font-semibold">18 de Junho, 2026</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-6 space-y-8">
+        
+        <!-- Metrics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-navy">
+                <p class="text-sm text-gray-500 font-medium uppercase">Total da Turma</p>
+                <p class="text-3xl font-bold text-navy">54</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-green-500">
+                <p class="text-sm text-gray-500 font-medium uppercase">Confirmados (RSVP)</p>
+                <div class="flex items-baseline space-x-2">
+                    <p class="text-3xl font-bold text-green-600">12</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-orange">
+                <p class="text-sm text-gray-500 font-medium uppercase">Só Pré-inscritos</p>
+                <p class="text-3xl font-bold text-orange">15</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-red-400">
+                <p class="text-sm text-gray-500 font-medium uppercase">Sem Interação</p>
+                <p class="text-3xl font-bold text-red-500">27</p>
+            </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="bg-white p-6 rounded-xl shadow-sm grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1 flex flex-col justify-center">
+                <h2 class="text-xl font-bold text-navy mb-2">Funil de Engajamento</h2>
+                <p class="text-sm text-gray-500 mb-6">Distribuição atual dos membros entre presença confirmada e interesse temático.</p>
+                <div class="space-y-4">
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="font-medium text-green-600">RSVP: 12</span>
+                        <span class="font-bold">22%</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-2">
+                        <div class="bg-green-500 h-2 rounded-full" style="width: 22%"></div>
+                    </div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="font-medium text-orange">Interagiram: 27</span>
+                        <span class="font-bold">50%</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-2">
+                        <div class="bg-orange h-2 rounded-full" style="width: 50%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="lg:col-span-2 h-64">
+                <canvas id="engagementChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Detailed Lists -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- RSVP Column -->
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col h-[500px] border-t-4 border-green-500">
+                <div class="p-4 bg-green-50 flex justify-between items-center">
+                    <h3 class="font-bold text-green-800">Confirmados (RSVP)</h3>
+                    <span class="bg-green-200 text-green-800 text-xs px-2 py-1 rounded-full font-bold">12</span>
+                </div>
+                <div class="p-4 overflow-y-auto custom-scrollbar flex-grow space-y-2" id="list-rsvp"></div>
+            </div>
+
+            <!-- Only Pre Column -->
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col h-[500px] border-t-4 border-orange">
+                <div class="p-4 bg-orange/10 flex justify-between items-center">
+                    <h3 class="font-bold text-orange">Só Pré-inscritos</h3>
+                    <span class="bg-orange text-white text-xs px-2 py-1 rounded-full font-bold">15</span>
+                </div>
+                <div class="p-4 overflow-y-auto custom-scrollbar flex-grow space-y-2" id="list-pre"></div>
+            </div>
+
+            <!-- No Interaction Column -->
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col h-[500px] border-t-4 border-red-400">
+                <div class="p-4 bg-red-50 flex justify-between items-center">
+                    <h3 class="font-bold text-red-700">Sem Interação</h3>
+                    <span class="bg-red-200 text-red-700 text-xs px-2 py-1 rounded-full font-bold">27</span>
+                </div>
+                <div class="p-4 overflow-y-auto custom-scrollbar flex-grow space-y-2" id="list-no"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const rsvp = [
+            'Cesar Augusto de Carvalho', 'Gabriela Kirschner', 'Felipe Clemente Santos', 
+            'Genésio Lemos Couto', 'Genilda Saji', 'FERNANDO INACIO DA COSTA', 
+            'Alexandre Sante Vasto Júnior', 'Izabela Ianelli', 'Roberto Armelin', 
+            'Paulo Roberto Melo de Castro Nogueira', 'Gustavo Fleichman', 'Leticia Maria Pereira Rodrigues'
+        ];
+
+        const preRegisteredOnly = [
+            'Luciene Teixeira Magalhães', 'FABIO Magnus Ferreira Lauriano Leme', 
+            'Luis Fernando Peres de Freitas', 'Ricardo Augusto Fabiano Chiminazzo', 
+            'Luciana Teles', 'Paulo Siqueira', 'Rodrigo Cesar Leme Silva', 
+            'Daniel Castello', 'Sandra Lucena Souto', 'Valéria Melo de Andrade', 
+            'Valesca Regina dos Santos Prates', 'José Carlos do Nascimento', 
+            'Luiz Fernando Chaves Mendonça', 'Joaquim Fernando Pires de Campos', 'Carlos Ramalho Foz Neto'
+        ];
+
+        const noInteraction = [
+            'Marcelo Scharra', 'Nauro Feitosa Freitas', 'Daniela Camarinha', 
+            'Angélica Nkyn', 'Argemiro Antonio Fontes Mendonça', 'Jaison Coelho Stahnke', 
+            'Sabrina Medeiros', 'André Campos Antunes', 'Pedro Henrique Bortolotto Fagundes Alves', 
+            'Filipe Fernandes Moreira', 'Henrique Antônio Loureiro Gonçalves', 'Rafael Queiroz Silveira', 
+            'Rogério Mansur Guedes', 'Wellington Rodrigues de Souza', 'Sofia Nunes', 
+            'Santiago Chamorro', 'Sergio Ricardo Ramos Bueno', 'Joelson Luís Zandoná', 
+            'Patrícia Cândido', 'Ivana Novaes Caroso', 'Herbert Pessoa Lobo',
+            'Milena Carolina de Almeida',
+            'Ricardo Andres Roman Junior', 'Ricardo Augusto Bressiani', 'Paulo Ghinato', 'Carlos Alberto Marin', 'Rodrigo Negrini'
+        ];
+
+        const renderList = (id, items) => {
+            const container = document.getElementById(id);
+            if(!container) return;
+            items.sort().forEach(name => {
+                const div = document.createElement('div');
+                div.className = `p-3 text-sm border-b border-gray-50 hover:bg-gray-50 transition-colors flex items-center`;
+                div.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3 text-[10px] font-bold text-gray-400">
+                        ${name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()}
+                    </div>
+                    <span class="font-medium text-gray-700">${name}</span>
+                `;
+                container.appendChild(div);
+            });
+        };
+
+        renderList('list-rsvp', rsvp);
+        renderList('list-pre', preRegisteredOnly);
+        renderList('list-no', noInteraction);
+
+        const ctx = document.getElementById('engagementChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Confirmados (RSVP)', 'Só Pré-inscritos', 'Sem Interação'],
+                datasets: [{
+                    data: [12, 15, 28],
+                    backgroundColor: ['#16a34a', '#FF6600', '#ef4444'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    </script>
+</body>
+</html>
